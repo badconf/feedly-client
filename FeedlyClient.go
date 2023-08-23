@@ -9,6 +9,7 @@ import (
 	"strconv"
 )
 
+// FeedlyClient represents the client to interact with Feedly's APIs.
 type FeedlyClient struct {
 	ClientID          string
 	ClientSecret      string
@@ -19,6 +20,7 @@ type FeedlyClient struct {
 	Secret            string
 }
 
+// NewFeedlyClient initializes a new Feedly client with the given options.
 func NewFeedlyClient(options map[string]interface{}) *FeedlyClient {
 	client := &FeedlyClient{
 		ClientID:          options["client_id"].(string),
@@ -38,6 +40,7 @@ func NewFeedlyClient(options map[string]interface{}) *FeedlyClient {
 	return client
 }
 
+// GetCodeURL constructs the URL for OAuth authentication with Feedly.
 func (client *FeedlyClient) GetCodeURL(callbackURL string) string {
 	scope := "https://cloud.feedly.com/subscriptions"
 	responseType := "code"
@@ -47,6 +50,7 @@ func (client *FeedlyClient) GetCodeURL(callbackURL string) string {
 	return requestURL
 }
 
+// GetAccessToken retrieves the access token using the authentication code.
 func (client *FeedlyClient) GetAccessToken(redirectURI, code string) (map[string]interface{}, error) {
 	params := url.Values{
 		"client_id":     {client.ClientID},
@@ -65,6 +69,7 @@ func (client *FeedlyClient) GetAccessToken(redirectURI, code string) (map[string
 	return result, nil
 }
 
+// RefreshAccessToken refreshes the access token using the refresh token.
 func (client *FeedlyClient) RefreshAccessToken(refreshToken string) (map[string]interface{}, error) {
 	params := url.Values{
 		"refresh_token": {refreshToken},
@@ -82,6 +87,7 @@ func (client *FeedlyClient) RefreshAccessToken(refreshToken string) (map[string]
 	return result, nil
 }
 
+// GetUserProfile fetches the user's profile information.
 func (client *FeedlyClient) GetUserProfile(accessToken string) (map[string]interface{}, error) {
 	headers := map[string]string{
 		"Authorization": "OAuth " + accessToken,
@@ -100,6 +106,7 @@ func (client *FeedlyClient) GetUserProfile(accessToken string) (map[string]inter
 	return result, nil
 }
 
+// GetUserSubscriptions fetches the list of user's subscriptions.
 func (client *FeedlyClient) GetUserSubscriptions(accessToken string) ([]map[string]interface{}, error) {
 	headers := map[string]string{
 		"Authorization": "OAuth " + accessToken,
@@ -118,6 +125,7 @@ func (client *FeedlyClient) GetUserSubscriptions(accessToken string) ([]map[stri
 	return result, nil
 }
 
+// GetFeedContent fetches the content of a specific feed.
 func (client *FeedlyClient) GetFeedContent(accessToken, streamID string, unreadOnly bool, newerThan int64) (map[string]interface{}, error) {
 	headers := map[string]string{
 		"Authorization": "OAuth " + accessToken,
@@ -141,6 +149,7 @@ func (client *FeedlyClient) GetFeedContent(accessToken, streamID string, unreadO
 	return result, nil
 }
 
+// MarkArticleRead marks one or multiple articles as read.
 func (client *FeedlyClient) MarkArticleRead(accessToken string, entryIds []string) (*http.Response, error) {
 	headers := map[string]string{
 		"content-type":  "application/json",
@@ -161,6 +170,7 @@ func (client *FeedlyClient) MarkArticleRead(accessToken string, entryIds []strin
 	return res, err
 }
 
+// SaveForLater saves one or multiple articles for later reading.
 func (client *FeedlyClient) SaveForLater(accessToken, userID string, entryIds []string) (*http.Response, error) {
 	headers := map[string]string{
 		"content-type":  "application/json",
@@ -179,6 +189,7 @@ func (client *FeedlyClient) SaveForLater(accessToken, userID string, entryIds []
 	return res, err
 }
 
+// getEndpoint constructs the URL for the given endpoint path.
 func (client *FeedlyClient) getEndpoint(path string) string {
 	return "https://" + client.ServiceHost + "/" + path
 }
